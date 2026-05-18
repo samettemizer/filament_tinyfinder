@@ -1,7 +1,7 @@
 {
   "name": "filament-tinyfinder",
-  "version": "3.0.0",
-  "description": "TinyFinder Filament Plugin - Modern asset build",
+  "version": "2.0",
+  "description": "TinyFinder - Filament Plugin",
   "private": true,
   "type": "module",
   "scripts": {

@@ -1,0 +1,12 @@
+/vendor export-ignore
+/node_modules export-ignore
+/.idea export-ignore
+/.vscode export-ignore
+/.phpunit.result.cache export-ignore
+/public/hot export-ignore
+/public/storage export-ignore
+/storage/*.key export-ignore
+/npm-debug.log export-ignore
+/yarn-error.log export-ignore
+/.DS_Store export-ignore
+/Thumbs.db export-ignore

@@ -27,6 +27,7 @@ use Stemizer\FilamentTinyFinder\Services\FileUploadService;
 
 class ExampleResource extends Resource
 {
+    // This example assumes the host application has an App\Models\Product model.
     protected static ?string $model = Product::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-shopping-bag';
@@ -331,11 +332,11 @@ class ExampleResource extends Resource
                         <div class="tinyfinder-archive-option-meta">{$meta}</div>
                     </div>
                     <div class="tinyfinder-archive-option-actions">
-                        <button type="button" data-tinyfinder-archive-action="copy" title="Copy URL">Copy</button>
-                        <button type="button" data-tinyfinder-archive-action="rename" title="Rename">Rename</button>
-                        <button type="button" data-tinyfinder-archive-action="resize" title="Resize">Resize</button>
-                        <button type="button" data-tinyfinder-archive-action="crop" title="Crop">Crop</button>
-                        <button type="button" data-tinyfinder-archive-action="delete" title="Delete">Delete</button>
+                        <button type="button" data-tinyfinder-archive-action="copy" title="Copy URL">☍</button>
+                        <button type="button" data-tinyfinder-archive-action="rename" title="Rename">✎</button>
+                        <button type="button" data-tinyfinder-archive-action="resize" title="Resize">⚙</button>
+                        <button type="button" data-tinyfinder-archive-action="crop" title="Crop">✂</button>
+                        <button type="button" data-tinyfinder-archive-action="delete" title="Delete">🗑</button>
                     </div>
                 </div>
                 HTML;
@@ -349,9 +350,9 @@ class ExampleResource extends Resource
                     <div class="tinyfinder-archive-option-meta">{$meta}</div>
                 </div>
                 <div class="tinyfinder-archive-option-actions">
-                    <button type="button" data-tinyfinder-archive-action="copy" title="Copy URL">Copy</button>
-                    <button type="button" data-tinyfinder-archive-action="rename" title="Rename">Rename</button>
-                    <button type="button" data-tinyfinder-archive-action="delete" title="Delete">Delete</button>
+                    <button type="button" data-tinyfinder-archive-action="copy" title="Copy URL">☍</button>
+                    <button type="button" data-tinyfinder-archive-action="rename" title="Rename">✎</button>
+                    <button type="button" data-tinyfinder-archive-action="delete" title="Delete">🗑</button>
                 </div>
             </div>
             HTML;

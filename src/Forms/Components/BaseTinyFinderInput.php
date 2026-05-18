@@ -395,7 +395,7 @@ abstract class BaseTinyFinderInput extends TextInput
                 </div>
                 <div class="tinyfinder-archive-option-actions">
                     <button type="button" data-tinyfinder-archive-action="copy" title="Copy URL">☍</button>
-                    <button type="button" data-tinyfinder-archive-action="rename" title="Rename">✎;</button>
+                    <button type="button" data-tinyfinder-archive-action="rename" title="Rename">✎</button>
                     <button type="button" data-tinyfinder-archive-action="delete" title="Delete">🗑</button>
                 </div>
             </div>

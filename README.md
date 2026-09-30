@@ -7,7 +7,7 @@ It provides image and file uploads, an archive browser, image crop/resize action
 ## Requirements
 
 - PHP 8.2+
-- Laravel 12+
+- Laravel 12 or 13
 - Filament 5.6+
 - GD or Imagick
 

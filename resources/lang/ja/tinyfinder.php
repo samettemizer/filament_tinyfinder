@@ -27,7 +27,7 @@ return [
     'alert_wait_current_process' => '現在のプロセスのためお待ちください',
     'alert_delete_confirm' => 'あなたをこの項目完全に削除することを確認したいですか?',
     'alert_delete_success' => 'ファイルが正常に削除されました',
-    'alert_upload_success' => '{count}個のファイルが正常にアップロードされました',
+    'alert_upload_success' => ':count個のファイルが正常にアップロードされました',
     'alert_crop_success' => '画像が正常にトリミングされました',
     'alert_resize_success' => '画像のサイズが正常に変更されました',
     'alert_rotate_success' => '画像が正常に回転されました',

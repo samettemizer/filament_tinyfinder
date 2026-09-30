@@ -21,22 +21,31 @@ class TinyFinderResource extends Resource
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-photo';
 
-    protected static ?string $navigationLabel = 'File Manager';
-
-    protected static ?string $modelLabel = 'File';
-
-    protected static ?string $pluralModelLabel = 'Files';
-
     protected static ?int $navigationSort = 10;
+
+    public static function getNavigationLabel(): string
+    {
+        return __('filament-tinyfinder::tinyfinder.navigation_label');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament-tinyfinder::tinyfinder.type_file');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament-tinyfinder::tinyfinder.type_files');
+    }
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
-                Section::make('File Information')
+                Section::make(__('filament-tinyfinder::tinyfinder.form_file_info'))
                     ->schema([
                         Forms\Components\FileUpload::make('upload')
-                            ->label('File')
+                            ->label(__('filament-tinyfinder::tinyfinder.type_file'))
                             ->required()
                             ->storeFiles(false)
                             ->maxSize(fn () => (int) ceil(max(
@@ -46,42 +55,48 @@ class TinyFinderResource extends Resource
                             ->visibleOn('create'),
 
                         Forms\Components\TextInput::make('name')
+                            ->label(__('filament-tinyfinder::tinyfinder.column_name'))
                             ->required()
                             ->maxLength(255)
                             ->hiddenOn('create'),
 
                         Forms\Components\Select::make('type')
+                            ->label(__('filament-tinyfinder::tinyfinder.column_type'))
                             ->options([
-                                'image' => 'Image',
-                                'file' => 'File',
+                                'image' => __('filament-tinyfinder::tinyfinder.type_image'),
+                                'file' => __('filament-tinyfinder::tinyfinder.type_file'),
                             ])
                             ->required()
                             ->disabled()
                             ->hiddenOn('create'),
 
                         Forms\Components\TextInput::make('extension')
+                            ->label(__('filament-tinyfinder::tinyfinder.column_extension'))
                             ->disabled()
                             ->hiddenOn('create'),
 
                         Forms\Components\TextInput::make('mime_type')
-                            ->label('MIME Type')
+                            ->label(__('filament-tinyfinder::tinyfinder.form_mime_type'))
                             ->disabled()
                             ->hiddenOn('create'),
 
                         Forms\Components\TextInput::make('size')
+                            ->label(__('filament-tinyfinder::tinyfinder.column_size'))
                             ->formatStateUsing(fn ($state) => static::formatFileSize($state))
                             ->disabled()
                             ->hiddenOn('create'),
                     ])
                     ->columns(2),
 
-                Section::make('Image Dimensions')
+                Section::make(__('filament-tinyfinder::tinyfinder.form_image_dimensions'))
                     ->schema([
                         Forms\Components\TextInput::make('width')
+                            ->label(__('filament-tinyfinder::tinyfinder.text_width'))
                             ->numeric()
                             ->disabled(),
 
                         Forms\Components\TextInput::make('height')
+                            ->label(__('filament-tinyfinder::tinyfinder.text_height'))
                             ->numeric()
                             ->disabled(),
                     ])
@@ -89,20 +104,20 @@ class TinyFinderResource extends Resource
                     ->visible(fn ($record) => $record?->type === 'image')
                     ->hiddenOn('create'),
 
-                Section::make('Settings')
+                Section::make(__('filament-tinyfinder::tinyfinder.form_settings'))
                     ->schema([
                         Forms\Components\Toggle::make('is_private')
-                            ->label('Private File')
-                            ->helperText('Only you can see this file'),
+                            ->label(__('filament-tinyfinder::tinyfinder.form_private_file'))
+                            ->helperText(__('filament-tinyfinder::tinyfinder.text_private_upload_title')),
 
                         Forms\Components\Toggle::make('has_thumbnails')
-                            ->label('Has Thumbnails')
+                            ->label(__('filament-tinyfinder::tinyfinder.form_has_thumbnails'))
                             ->disabled()
                             ->hiddenOn('create'),
                     ])
                     ->columns(2),
 
-                Section::make('Preview')
+                Section::make(__('filament-tinyfinder::tinyfinder.form_preview'))
                     ->schema([
                         Forms\Components\Placeholder::make('preview')
                             ->content(fn ($record) => $record ? view('filament-tinyfinder::file-preview', ['file' => $record]) : null),
@@ -116,17 +131,20 @@ class TinyFinderResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\ImageColumn::make('thumbnail_url')
-                    ->label('Preview')
+                    ->label(__('filament-tinyfinder::tinyfinder.column_preview'))
                     ->circular()
                     ->defaultImageUrl(url('/images/file-placeholder.png'))
                     ->size(60),
 
                 Tables\Columns\TextColumn::make('name')
+                    ->label(__('filament-tinyfinder::tinyfinder.column_name'))
                     ->searchable()
                     ->sortable()
                     ->description(fn ($record) => $record->basename),
 
                 Tables\Columns\BadgeColumn::make('type')
+                    ->label(__('filament-tinyfinder::tinyfinder.column_type'))
+                    ->formatStateUsing(fn (string $state): string => __("filament-tinyfinder::tinyfinder.type_{$state}"))
                     ->colors([
                         'primary' => 'image',
                         'gray' => 'file',
@@ -137,60 +155,66 @@ class TinyFinderResource extends Resource
                     ]),
 
                 Tables\Columns\TextColumn::make('extension')
+                    ->label(__('filament-tinyfinder::tinyfinder.column_extension'))
                     ->badge()
                     ->color('gray'),
 
                 Tables\Columns\TextColumn::make('formatted_size')
-                    ->label('Size')
+                    ->label(__('filament-tinyfinder::tinyfinder.column_size'))
                     ->sortable(query: fn (Builder $query, string $direction): Builder => $query->orderBy('size', $direction)),
 
                 Tables\Columns\IconColumn::make('has_thumbnails')
                     ->boolean()
-                    ->label('Thumbs')
+                    ->label(__('filament-tinyfinder::tinyfinder.column_thumbs'))
                     ->alignCenter(),
 
                 Tables\Columns\IconColumn::make('is_private')
                     ->boolean()
-                    ->label('Private')
+                    ->label(__('filament-tinyfinder::tinyfinder.column_private'))
                     ->alignCenter(),
 
                 Tables\Columns\TextColumn::make('user.name')
-                    ->label('Owner')
+                    ->label(__('filament-tinyfinder::tinyfinder.column_owner'))
                     ->searchable()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('filament-tinyfinder::tinyfinder.column_created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('type')
+                    ->label(__('filament-tinyfinder::tinyfinder.filter_type'))
                     ->options([
-                        'image' => 'Images',
-                        'file' => 'Files',
+                        'image' => __('filament-tinyfinder::tinyfinder.type_images'),
+                        'file' => __('filament-tinyfinder::tinyfinder.type_files'),
                     ]),
 
                 Tables\Filters\SelectFilter::make('extension')
+                    ->label(__('filament-tinyfinder::tinyfinder.filter_extension'))
                     ->options(fn () => TinyFinderFile::pluck('extension', 'extension')->unique()->toArray()),
 
                 Tables\Filters\TernaryFilter::make('is_private')
-                    ->label('Privacy')
-                    ->placeholder('All files')
-                    ->trueLabel('Private only')
-                    ->falseLabel('Public only'),
+                    ->label(__('filament-tinyfinder::tinyfinder.filter_privacy'))
+                    ->placeholder(__('filament-tinyfinder::tinyfinder.filter_all_files'))
+                    ->trueLabel(__('filament-tinyfinder::tinyfinder.filter_private_only'))
+                    ->falseLabel(__('filament-tinyfinder::tinyfinder.filter_public_only')),
 
                 Tables\Filters\Filter::make('my_files')
-                    ->label('My Files')
+                    ->label(__('filament-tinyfinder::tinyfinder.filter_my_files'))
                     ->query(fn (Builder $query) => $query->where('user_id', auth()->id())),
             ])
             ->actions([
                 Actions\Action::make('download')
+                    ->label(__('filament-tinyfinder::tinyfinder.action_download'))
                     ->icon('heroicon-o-arrow-down-tray')
                     ->url(fn ($record) => $record->url)
                     ->openUrlInNewTab(),
 
                 Actions\Action::make('copy_url')
+                    ->label(__('filament-tinyfinder::tinyfinder.action_copy_url'))
                     ->icon('heroicon-o-clipboard')
                     ->action(function ($record) {
                         // This will be handled by Alpine.js Clipboard API
@@ -207,13 +231,13 @@ class TinyFinderResource extends Resource
                     Actions\DeleteBulkAction::make(),
 
                     Actions\BulkAction::make('make_private')
-                        ->label('Make Private')
+                        ->label(__('filament-tinyfinder::tinyfinder.action_make_private'))
                         ->icon('heroicon-o-lock-closed')
                         ->action(fn ($records) => $records->each->update(['is_private' => true]))
                         ->deselectRecordsAfterCompletion(),
 
                     Actions\BulkAction::make('make_public')
-                        ->label('Make Public')
+                        ->label(__('filament-tinyfinder::tinyfinder.action_make_public'))
                         ->icon('heroicon-o-lock-open')
                         ->action(fn ($records) => $records->each->update(['is_private' => false]))
                         ->deselectRecordsAfterCompletion(),

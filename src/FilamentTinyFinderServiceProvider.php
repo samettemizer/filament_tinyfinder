@@ -5,6 +5,8 @@ namespace Stemizer\FilamentTinyFinder;
 use Filament\Support\Assets\Css;
 use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
+use Filament\Support\Facades\FilamentView;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Filesystem\Filesystem;
 use Livewire\Livewire;
 use Spatie\LaravelPackageTools\Package;
@@ -74,6 +76,12 @@ class FilamentTinyFinderServiceProvider extends PackageServiceProvider
 
         // Storage disk configuration
         $this->configureTinyFinderDisk();
+
+        // Translations for the browser-side dialogs in resources/js/tinyfinder.js
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::SCRIPTS_BEFORE,
+            fn (): string => '<script>window.tinyFinderTranslations = ' . \Illuminate\Support\Js::from($this->getScriptTranslations()) . ';</script>',
+        );
     }
 
     protected function getAssetPackageName(): ?string
@@ -110,6 +118,24 @@ class FilamentTinyFinderServiceProvider extends PackageServiceProvider
             ...$this->getStyles(),
             ...$this->getScripts(),
         ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function getScriptTranslations(): array
+    {
+        $keys = [
+            'alert_delete_confirm',
+            'button_cancel',
+            'button_crop',
+            'text_height',
+            'text_process_failed',
+            'text_rename',
+            'text_width',
+        ];
+
+        return array_combine($keys, array_map(fn (string $key): string => __("filament-tinyfinder::tinyfinder.{$key}"), $keys));
     }
 
     /**

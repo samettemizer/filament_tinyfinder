@@ -16,6 +16,11 @@ return [
     'button_crop' => 'Crop',
     'button_resize' => 'Resize',
     'button_rotate' => 'Rotate',
+    'button_open' => 'Open',
+    'button_new_upload' => 'New Upload',
+    'button_use_selected_file' => 'Use selected file',
+    'button_use_uploaded_file' => 'Use uploaded file',
+    'button_choose_from_archive' => 'Choose from archive',
 
     // Alerts
     'alert_not_found' => 'File not found.',
@@ -27,10 +32,11 @@ return [
     'alert_wait_current_process' => 'Please wait for current process.',
     'alert_delete_confirm' => 'Are you sure you want to delete this file?',
     'alert_delete_success' => 'File deleted successfully',
-    'alert_upload_success' => '{count} file(s) uploaded successfully',
+    'alert_upload_success' => ':count file(s) uploaded successfully',
     'alert_crop_success' => 'Image cropped successfully',
     'alert_resize_success' => 'Image resized successfully',
     'alert_rotate_success' => 'Image rotated successfully',
+    'alert_no_file_uploaded' => 'Please choose a file to upload.',
 
     // Text
     'text_processing' => 'Processing...',
@@ -58,6 +64,9 @@ return [
     'text_file_not_found' => 'File Not Found',
     'text_url_copied' => 'URL copied to clipboard!',
     'text_copy_failed' => 'Failed to copy URL',
+    'text_input_placeholder' => 'Upload a new file or choose from archive',
+    'text_open_selected_file' => 'Open selected file',
+    'text_create_thumbs_help' => 'Automatically generate thumbnail sizes (images only)',
 
     // Resize Types
     'resize_no' => "Don't resize",
@@ -115,6 +124,7 @@ return [
     'form_preview' => 'Preview',
     'form_private_file' => 'Private File',
     'form_has_thumbnails' => 'Has Thumbnails',
+    'form_mime_type' => 'MIME Type',
 
     // Upload
     'upload_drag_drop' => 'Drag and drop files here or click to browse',
@@ -127,6 +137,7 @@ return [
     'notification_error' => 'Error!',
     'notification_warning' => 'Warning!',
     'notification_info' => 'Info',
+    'notification_file_selected' => 'File selected',
 
     // Validation
     'validation_required' => 'This field is required',
@@ -134,4 +145,15 @@ return [
     'validation_max' => 'Maximum value is {max}',
     'validation_image' => 'File must be an image',
     'validation_mimes' => 'Invalid file type',
+    'validation_not_image' => 'File must not be an image',
+
+    // Archive
+    'archive_heading' => 'TinyFinder',
+    'archive_choose_image' => 'Choose Image',
+    'archive_choose_file' => 'Choose File',
+    'archive_select_placeholder' => 'Select an item',
+
+    // Rich Editor
+    'editor_image_archive' => 'Image Archive',
+    'editor_file_archive' => 'File Archive',
 ];

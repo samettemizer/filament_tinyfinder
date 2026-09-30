@@ -31,7 +31,7 @@ abstract class BaseTinyFinderInput extends TextInput
             ->extraInputAttributes([
                 'class' => 'tinyfinder-input-trigger',
             ], merge: true)
-            ->placeholder('Upload a new file or choose from archive')
+            ->placeholder(__('filament-tinyfinder::tinyfinder.text_input_placeholder'))
             ->afterStateHydrated(function (TextInput $component, ?string $state): void {
                 if (blank($state)) {
                     return;
@@ -65,12 +65,12 @@ abstract class BaseTinyFinderInput extends TextInput
     protected function makeCopyAction(): Action
     {
         return Action::make('tinyfinder_copy')
-            ->label('Copy')
+            ->label(__('filament-tinyfinder::tinyfinder.button_copy_to_clipboard'))
             ->icon('heroicon-o-clipboard-document')
             ->visible(fn (?string $state): bool => filled($state))
             ->alpineClickHandler(function (?string $state): string {
                 $copyableState = Js::from(filled($state) ? $this->getPreviewUrl($this->resolveStoredValue($state)) : '');
-                $copyMessage = Js::from('Copied');
+                $copyMessage = Js::from(__('filament-tinyfinder::tinyfinder.text_url_copied'));
 
                 return <<<JS
                     (async () => {
@@ -116,24 +116,24 @@ abstract class BaseTinyFinderInput extends TextInput
     protected function makeUploadAction(): Action
     {
         return Action::make('tinyfinder_upload')
-            ->label('Upload')
+            ->label(__($this->tinyFinderType === 'image' ? 'filament-tinyfinder::tinyfinder.text_upload_img' : 'filament-tinyfinder::tinyfinder.text_upload_file'))
             ->icon('heroicon-o-arrow-up-tray')
             ->extraAttributes(['class' => 'tinyfinder-upload-action'])
             ->schema([
                 $this->configureUploadField(
                     FileUpload::make('file')
-                        ->label($this->tinyFinderType === 'image' ? 'Image' : 'File')
+                        ->label(__("filament-tinyfinder::tinyfinder.type_{$this->tinyFinderType}"))
                         ->required()
                         ->storeFiles(false)
                         ->maxSize($this->getMaxUploadSizeInKilobytes())
                 ),
             ])
-            ->modalHeading($this->tinyFinderType === 'image' ? 'Upload Image' : 'Upload File')
-            ->modalSubmitActionLabel('Use uploaded file')
+            ->modalHeading(__($this->tinyFinderType === 'image' ? 'filament-tinyfinder::tinyfinder.text_upload_img' : 'filament-tinyfinder::tinyfinder.text_upload_file'))
+            ->modalSubmitActionLabel(__('filament-tinyfinder::tinyfinder.button_use_uploaded_file'))
             ->modalCancelAction(false)
             ->extraModalFooterActions([
                 Action::make('tinyfinder_search_archive')
-                    ->label('Search in archive')
+                    ->label(__('filament-tinyfinder::tinyfinder.button_search_in_archive'))
                     ->icon('heroicon-o-magnifying-glass')
                     ->color('gray')
                     ->alpineClickHandler(<<<'JS'
@@ -145,7 +145,7 @@ abstract class BaseTinyFinderInput extends TextInput
 
                 if (! $file instanceof UploadedFile) {
                     throw ValidationException::withMessages([
-                        'file' => 'Please choose a file to upload.',
+                        'file' => __('filament-tinyfinder::tinyfinder.alert_no_file_uploaded'),
                     ]);
                 }
 
@@ -158,8 +158,8 @@ abstract class BaseTinyFinderInput extends TextInput
 
                     throw ValidationException::withMessages([
                         'file' => $this->tinyFinderType === 'image'
-                            ? 'Please upload an image file.'
-                            : 'Please upload a non-image file.',
+                            ? __('filament-tinyfinder::tinyfinder.validation_image')
+                            : __('filament-tinyfinder::tinyfinder.validation_not_image'),
                     ]);
                 }
 
@@ -167,7 +167,7 @@ abstract class BaseTinyFinderInput extends TextInput
 
                 Notification::make()
                     ->success()
-                    ->title('File selected')
+                    ->title(__('filament-tinyfinder::tinyfinder.notification_file_selected'))
                     ->body($record->name)
                     ->send();
             });
@@ -176,14 +176,14 @@ abstract class BaseTinyFinderInput extends TextInput
     protected function makeArchiveAction(): Action
     {
         return Action::make('tinyfinder_archive')
-            ->label('Archive')
+            ->label(__('filament-tinyfinder::tinyfinder.button_archive'))
             ->icon('heroicon-o-archive-box')
             ->extraAttributes(['class' => 'tinyfinder-archive-action'])
             ->schema([
                 Select::make('file_id')
-                    ->label($this->tinyFinderType === 'image' ? 'Choose Image' : 'Choose File')
+                    ->label(__("filament-tinyfinder::tinyfinder.archive_choose_{$this->tinyFinderType}"))
                     ->required()
-                    ->placeholder('Select an item')
+                    ->placeholder(__('filament-tinyfinder::tinyfinder.archive_select_placeholder'))
                     ->autofocus()
                     ->searchable()
                     ->allowHtml()
@@ -193,16 +193,16 @@ abstract class BaseTinyFinderInput extends TextInput
                     ->getSearchResultsUsing(fn (string $search): array => $this->getArchiveOptions($search))
                     ->getOptionLabelUsing(fn ($value): ?string => ($file = TinyFinderFile::find($value)) ? $this->getArchiveOptionLabel($file) : null),
             ])
-            ->modalHeading('TinyFinder')
+            ->modalHeading(__('filament-tinyfinder::tinyfinder.archive_heading'))
             ->extraModalWindowAttributes(['class' => 'tinyfinder-archive-modal'], merge: true)
             ->modalCloseButton(false)
-            ->modalSubmitActionLabel('Use selected file')
+            ->modalSubmitActionLabel(__('filament-tinyfinder::tinyfinder.button_use_selected_file'))
             ->modalSubmitAction(fn (Action $action): Action => $action->extraAttributes([
-                'class' => 'tinyfinder-archive-submit-hidden',
+                'class' => 'tinyfinder-archive-submit tinyfinder-archive-submit-hidden',
             ])->color('gray'))
             ->extraModalFooterActions([
                 Action::make('tinyfinder_new_upload')
-                    ->label('New Upload')
+                    ->label(__('filament-tinyfinder::tinyfinder.button_new_upload'))
                     ->icon('heroicon-o-arrow-up-tray')
                     ->color('gray')
                     ->extraAttributes(['class' => 'tinyfinder-new-upload-action'], merge: true)
@@ -218,7 +218,7 @@ abstract class BaseTinyFinderInput extends TextInput
 
                 if (! $record) {
                     throw ValidationException::withMessages([
-                        'file_id' => 'Please choose a file from the archive.',
+                        'file_id' => __('filament-tinyfinder::tinyfinder.alert_not_selected_file'),
                     ]);
                 }
 
@@ -229,7 +229,7 @@ abstract class BaseTinyFinderInput extends TextInput
     protected function makeOpenAction(): Action
     {
         return Action::make('tinyfinder_open')
-            ->label('Open')
+            ->label(__('filament-tinyfinder::tinyfinder.button_open'))
             ->icon('heroicon-o-arrow-top-right-on-square')
             ->url(fn (?string $state): ?string => filled($state) ? $this->getPreviewUrl($this->resolveStoredValue($state)) : null, shouldOpenInNewTab: true)
             ->visible(fn (?string $state): bool => filled($state));
@@ -278,16 +278,19 @@ abstract class BaseTinyFinderInput extends TextInput
         $displayMarker = $this->displayNameMarker($state);
 
         if ($this->tinyFinderType !== 'image') {
-            return new HtmlString("{$displayMarker}<a href=\"{$url}\" target=\"_blank\" class=\"text-sm underline\">Open selected file</a>");
+            $label = e(__('filament-tinyfinder::tinyfinder.text_open_selected_file'));
+
+            return new HtmlString("{$displayMarker}<a href=\"{$url}\" target=\"_blank\" class=\"text-sm underline\">{$label}</a>");
         }
 
         $previewId = 'tinyfinder-image-preview-' . md5($this->getName() . '|' . $state);
+        $previewAlt = e(__('filament-tinyfinder::tinyfinder.form_preview'));
 
         return new HtmlString(
             <<<HTML
             {$displayMarker}
             <div id="{$previewId}" class="tinyfinder-image-preview rounded-lg border border-gray-200 bg-white p-1 shadow-xl ring-1 ring-gray-950/5 dark:border-white/10 dark:bg-gray-900 dark:ring-white/10" style="display: none; position: fixed; z-index: 9999; pointer-events: none;">
-                <img src="{$url}" alt="Preview" class="block max-w-xs rounded-md object-contain" style="max-height: 300px;" />
+                <img src="{$url}" alt="{$previewAlt}" class="block max-w-xs rounded-md object-contain" style="max-height: 300px;" />
             </div>
             <script>
                 (() => {
@@ -361,6 +364,11 @@ abstract class BaseTinyFinderInput extends TextInput
         $publicPath = e($this->getPublicPath($file->url));
         $fileUrl = e($this->getPreviewUrl($this->getPublicPath($file->url)));
         $previewUrl = e($this->getPreviewUrl($this->getPublicPath($file->thumbnail_url ?? $file->url)));
+        $copyTitle = e(__('filament-tinyfinder::tinyfinder.action_copy_url'));
+        $renameTitle = e(__('filament-tinyfinder::tinyfinder.text_rename'));
+        $resizeTitle = e(__('filament-tinyfinder::tinyfinder.button_resize'));
+        $cropTitle = e(__('filament-tinyfinder::tinyfinder.button_crop'));
+        $deleteTitle = e(__('filament-tinyfinder::tinyfinder.button_delete'));
 
         if ($file->type === 'image') {
             $dimensions = ($file->width && $file->height) ? e("{$file->width}x{$file->height}") : null;
@@ -376,11 +384,11 @@ abstract class BaseTinyFinderInput extends TextInput
                         <div class="tinyfinder-archive-option-meta">{$meta}</div>
                     </div>
                     <div class="tinyfinder-archive-option-actions">
-                        <button type="button" data-tinyfinder-archive-action="copy" title="Copy URL">☍</button>
-                        <button type="button" data-tinyfinder-archive-action="rename" title="Rename">✎</button>
-                        <button type="button" data-tinyfinder-archive-action="resize" title="Resize">⚙</button>
-                        <button type="button" data-tinyfinder-archive-action="crop" title="Crop">✂</button>
-                        <button type="button" data-tinyfinder-archive-action="delete" title="Delete">🗑</button>
+                        <button type="button" data-tinyfinder-archive-action="copy" title="{$copyTitle}">☍</button>
+                        <button type="button" data-tinyfinder-archive-action="rename" title="{$renameTitle}">✎</button>
+                        <button type="button" data-tinyfinder-archive-action="resize" title="{$resizeTitle}">⚙</button>
+                        <button type="button" data-tinyfinder-archive-action="crop" title="{$cropTitle}">✂</button>
+                        <button type="button" data-tinyfinder-archive-action="delete" title="{$deleteTitle}">🗑</button>
                     </div>
                 </div>
                 HTML;
@@ -394,9 +402,9 @@ abstract class BaseTinyFinderInput extends TextInput
                     <div class="tinyfinder-archive-option-meta">{$meta}</div>
                 </div>
                 <div class="tinyfinder-archive-option-actions">
-                    <button type="button" data-tinyfinder-archive-action="copy" title="Copy URL">☍</button>
-                    <button type="button" data-tinyfinder-archive-action="rename" title="Rename">✎</button>
-                    <button type="button" data-tinyfinder-archive-action="delete" title="Delete">🗑</button>
+                    <button type="button" data-tinyfinder-archive-action="copy" title="{$copyTitle}">☍</button>
+                    <button type="button" data-tinyfinder-archive-action="rename" title="{$renameTitle}">✎</button>
+                    <button type="button" data-tinyfinder-archive-action="delete" title="{$deleteTitle}">🗑</button>
                 </div>
             </div>
             HTML;

@@ -27,7 +27,7 @@ return [
     'alert_wait_current_process' => 'Por favor espere para proceso actual',
     'alert_delete_confirm' => '¿está seguro de que desea eliminar permanentemente este tema?',
     'alert_delete_success' => 'Archivo eliminado exitosamente',
-    'alert_upload_success' => '{count} archivo(s) subido(s) exitosamente',
+    'alert_upload_success' => ':count archivo(s) subido(s) exitosamente',
     'alert_crop_success' => 'Imagen recortada exitosamente',
     'alert_resize_success' => 'Tamaño de imagen cambiado exitosamente',
     'alert_rotate_success' => 'Imagen rotada exitosamente',

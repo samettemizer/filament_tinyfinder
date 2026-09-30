@@ -16,6 +16,11 @@ return [
     'button_crop' => 'Kırp',
     'button_resize' => 'Boyutlandır',
     'button_rotate' => 'Döndür',
+    'button_open' => 'Aç',
+    'button_new_upload' => 'Yeni Yükleme',
+    'button_use_selected_file' => 'Seçili dosyayı kullan',
+    'button_use_uploaded_file' => 'Yüklenen dosyayı kullan',
+    'button_choose_from_archive' => 'Arşivden seç',
 
     // Alerts
     'alert_not_found' => 'İşlem yapmak istediğiniz dosyaya erişilemiyor/kaldırılmış.',
@@ -27,10 +32,11 @@ return [
     'alert_wait_current_process' => 'Lütfen mevcut işlemin tamamlanmasını bekleyin.',
     'alert_delete_confirm' => 'Dosya kalıcı olarak silinecek, devam edilsin mi?',
     'alert_delete_success' => 'Dosya başarıyla silindi',
-    'alert_upload_success' => '{count} dosya başarıyla yüklendi',
+    'alert_upload_success' => ':count dosya başarıyla yüklendi',
     'alert_crop_success' => 'Resim başarıyla kırpıldı',
     'alert_resize_success' => 'Resim başarıyla boyutlandırıldı',
     'alert_rotate_success' => 'Resim başarıyla döndürüldü',
+    'alert_no_file_uploaded' => 'Lütfen yüklenecek bir dosya seçiniz.',
 
     // Text
     'text_processing' => 'Yükleniyor..',
@@ -58,6 +64,9 @@ return [
     'text_file_not_found' => 'Dosya Bulunamadı',
     'text_url_copied' => 'URL panoya kopyalandı!',
     'text_copy_failed' => 'URL kopyalanamadı',
+    'text_input_placeholder' => 'Yeni dosya yükleyin veya arşivden seçin',
+    'text_open_selected_file' => 'Seçili dosyayı aç',
+    'text_create_thumbs_help' => 'Küçük resim boyutlarını otomatik oluştur (yalnızca resimler)',
 
     // Resize Types
     'resize_no' => 'Boyutlandırma.',
@@ -115,6 +124,7 @@ return [
     'form_preview' => 'Önizleme',
     'form_private_file' => 'Özel Dosya',
     'form_has_thumbnails' => 'Küçük Resimleri Var',
+    'form_mime_type' => 'MIME Türü',
 
     // Upload
     'upload_drag_drop' => 'Dosyaları buraya sürükleyip bırakın veya göz atmak için tıklayın',
@@ -127,6 +137,7 @@ return [
     'notification_error' => 'Hata!',
     'notification_warning' => 'Uyarı!',
     'notification_info' => 'Bilgi',
+    'notification_file_selected' => 'Dosya seçildi',
 
     // Validation
     'validation_required' => 'Bu alan gereklidir',
@@ -134,4 +145,15 @@ return [
     'validation_max' => 'Maksimum değer {max}',
     'validation_image' => 'Dosya bir resim olmalıdır',
     'validation_mimes' => 'Geçersiz dosya türü',
+    'validation_not_image' => 'Dosya bir resim olmamalıdır',
+
+    // Archive
+    'archive_heading' => 'TinyFinder',
+    'archive_choose_image' => 'Resim Seç',
+    'archive_choose_file' => 'Dosya Seç',
+    'archive_select_placeholder' => 'Bir öğe seçin',
+
+    // Rich Editor
+    'editor_image_archive' => 'Resim Arşivi',
+    'editor_file_archive' => 'Dosya Arşivi',
 ];

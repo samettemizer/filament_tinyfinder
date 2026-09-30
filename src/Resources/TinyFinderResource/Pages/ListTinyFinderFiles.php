@@ -18,10 +18,11 @@ class ListTinyFinderFiles extends ListRecords
     {
         return [
             Actions\Action::make('upload')
-                ->label('Upload Files')
+                ->label(__('filament-tinyfinder::tinyfinder.button_upload_files'))
                 ->icon('heroicon-o-cloud-arrow-up')
                 ->form([
                     Forms\Components\FileUpload::make('files')
+                        ->label(__('filament-tinyfinder::tinyfinder.type_files'))
                         ->multiple()
                         ->maxFiles(10)
                         ->maxSize(config('filament-tinyfinder.uploads.max_file_size') / 1024)
@@ -34,13 +35,13 @@ class ListTinyFinderFiles extends ListRecords
                         ->required(),
 
                     Forms\Components\Toggle::make('is_private')
-                        ->label('Private Upload')
+                        ->label(__('filament-tinyfinder::tinyfinder.text_private_upload'))
                         ->default(false),
 
                     Forms\Components\Toggle::make('create_thumbnails')
-                        ->label('Create Thumbnails (Images only)')
+                        ->label(__('filament-tinyfinder::tinyfinder.text_create_thumbs'))
                         ->default(true)
-                        ->helperText('Automatically generate thumbnail sizes'),
+                        ->helperText(__('filament-tinyfinder::tinyfinder.text_create_thumbs_help')),
                 ])
                 ->action(function (array $data, FileUploadService $uploadService) {
                     $files = [];
@@ -76,7 +77,7 @@ class ListTinyFinderFiles extends ListRecords
 
                     Notification::make()
                         ->success()
-                        ->title(count($files) . ' file(s) uploaded successfully')
+                        ->title(__('filament-tinyfinder::tinyfinder.alert_upload_success', ['count' => count($files)]))
                         ->send();
                 })
                 ->slideOver(),

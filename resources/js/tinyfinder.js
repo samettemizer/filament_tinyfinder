@@ -6,6 +6,8 @@
  */
 
 (() => {
+    const tinyFinderTrans = (key) => window.tinyFinderTranslations?.[key] ?? key;
+
     const fallbackWriteText = (value) => new Promise((resolve, reject) => {
         try {
             const textarea = document.createElement('textarea');
@@ -218,13 +220,7 @@
         const modal = option.closest?.('.fi-modal') || document.querySelector('.fi-modal');
 
         setTimeout(() => {
-            const submitButton = Array.from(modal?.querySelectorAll('button') || []).find((button) => {
-                const text = button.textContent?.trim() || '';
-
-                return ! button.disabled && text === 'Use selected file';
-            });
-
-            submitButton?.click();
+            modal?.querySelector('.tinyfinder-archive-submit:not([disabled])')?.click();
         }, 120);
     };
 
@@ -244,7 +240,7 @@
         const modal = document.querySelector('.fi-modal');
         const field = window.tinyFinderActiveField || document.querySelector('.fi-fo-field-wrp:has(.tinyfinder-archive-action), [wire\\:key]:has(.tinyfinder-archive-action)');
 
-        modal?.querySelector('[aria-label="Close"], button[title="Close"]')?.click();
+        modal?.querySelector('.fi-modal-close-btn')?.click();
 
         setTimeout(() => {
             field?.querySelector('.tinyfinder-archive-action')?.click();
@@ -255,7 +251,7 @@
         const modal = document.querySelector('.fi-modal');
         const field = window.tinyFinderActiveField || document.querySelector('.fi-fo-field-wrp:has(.tinyfinder-upload-action), [wire\\:key]:has(.tinyfinder-upload-action)');
 
-        modal?.querySelector('[aria-label="Close"], button[title="Close"]')?.click();
+        modal?.querySelector('.fi-modal-close-btn')?.click();
 
         setTimeout(() => {
             field?.querySelector('.tinyfinder-upload-action')?.click();
@@ -272,13 +268,16 @@
                     <div class="tinyfinder-crop-selection"></div>
                 </div>
                 <div class="tinyfinder-crop-actions">
-                    <button type="button" data-crop-cancel>Cancel</button>
-                    <button type="button" data-crop-save>Crop</button>
+                    <button type="button" data-crop-cancel></button>
+                    <button type="button" data-crop-save></button>
                 </div>
             </div>
         `;
 
         document.body.appendChild(modal);
+
+        modal.querySelector('[data-crop-cancel]').textContent = tinyFinderTrans('button_cancel');
+        modal.querySelector('[data-crop-save]').textContent = tinyFinderTrans('button_crop');
 
         const stage = modal.querySelector('.tinyfinder-crop-stage');
         const image = modal.querySelector('img');
@@ -904,7 +903,7 @@ document.addEventListener('click', async (event) => {
         }
 
         if (action === 'rename') {
-            const name = window.prompt('Rename', option.dataset.fileName || '');
+            const name = window.prompt(tinyFinderTrans('text_rename'), option.dataset.fileName || '');
 
             if (! name) {
                 return;
@@ -919,13 +918,13 @@ document.addEventListener('click', async (event) => {
             const currentDimensions = option.querySelector('.tinyfinder-archive-option-meta')?.textContent?.match(/(\d+)\s*x\s*(\d+)/i);
             const currentWidth = option.dataset.width || currentDimensions?.[1] || '';
             const currentHeight = option.dataset.height || currentDimensions?.[2] || '';
-            const width = window.prompt('Width', currentWidth);
+            const width = window.prompt(tinyFinderTrans('text_width'), currentWidth);
 
             if (width === null) {
                 return;
             }
 
-            const height = window.prompt('Height', currentHeight);
+            const height = window.prompt(tinyFinderTrans('text_height'), currentHeight);
 
             if (height === null) {
                 return;
@@ -976,7 +975,7 @@ document.addEventListener('click', async (event) => {
         }
 
         if (action === 'delete') {
-            if (! window.confirm('Delete this file?')) {
+            if (! window.confirm(tinyFinderTrans('alert_delete_confirm'))) {
                 return;
             }
 
@@ -987,7 +986,7 @@ document.addEventListener('click', async (event) => {
         }
     } catch (error) {
         console.error(error);
-        window.alert('TinyFinder action failed.');
+        window.alert(tinyFinderTrans('text_process_failed'));
     }
 }, true);
 

@@ -27,7 +27,7 @@ return [
     'alert_wait_current_process' => 'Si prega di attendere per il processo corrente.',
     'alert_delete_confirm' => 'Sei sicuro di voler eliminare definitivamente questo elemento?',
     'alert_delete_success' => 'File eliminato con successo',
-    'alert_upload_success' => '{count} file caricato/i con successo',
+    'alert_upload_success' => ':count file caricato/i con successo',
     'alert_crop_success' => 'Immagine ritagliata con successo',
     'alert_resize_success' => 'Immagine ridimensionata con successo',
     'alert_rotate_success' => 'Immagine ruotata con successo',

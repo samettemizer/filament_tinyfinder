@@ -71,13 +71,13 @@ class ExampleResource extends Resource
                             ])
                             ->tools([
                                 RichEditorTool::make('attachFiles')
-                                    ->label('File Archive')
+                                    ->label(__('filament-tinyfinder::tinyfinder.editor_file_archive'))
                                     ->action()
                                     ->activeJsExpression('false')
                                     ->icon(Heroicon::PaperClip)
                                     ->iconAlias('forms:components.rich-editor.toolbar.attach-files'),
                                 RichEditorTool::make('tinyfinderInsertImage')
-                                    ->label('Image Archive')
+                                    ->label(__('filament-tinyfinder::tinyfinder.editor_image_archive'))
                                     ->action()
                                     ->activeJsExpression('false')
                                     ->icon(Heroicon::Photo),
@@ -95,7 +95,7 @@ class ExampleResource extends Resource
         return self::makeTinyFinderArchiveAction(
             name: 'attachFiles',
             type: 'file',
-            label: 'Choose from archive',
+            label: __('filament-tinyfinder::tinyfinder.button_choose_from_archive'),
             onSelected: function (RichEditor $component, TinyFinderFile $file, ?array $editorSelection): void {
                 $component->runCommands(
                     [
@@ -126,7 +126,7 @@ class ExampleResource extends Resource
         return self::makeTinyFinderArchiveAction(
             name: 'tinyfinderInsertImage',
             type: 'image',
-            label: 'Choose from archive',
+            label: __('filament-tinyfinder::tinyfinder.button_choose_from_archive'),
             onSelected: function (RichEditor $component, TinyFinderFile $file, ?array $editorSelection): void {
                 $component->runCommands(
                     [
@@ -153,12 +153,12 @@ class ExampleResource extends Resource
     ): Action {
         return Action::make($name)
             ->label($label)
-            ->modalHeading('TinyFinder')
+            ->modalHeading(__('filament-tinyfinder::tinyfinder.archive_heading'))
             ->modalWidth(Width::FourExtraLarge)
             ->extraModalWindowAttributes(['class' => 'tinyfinder-archive-modal'], merge: true)
             ->modalCloseButton(false)
-            ->modalSubmitActionLabel('Use selected file')
-            ->modalSubmitAction(fn (Action $action): Action => $action->color('gray'))
+            ->modalSubmitActionLabel(__('filament-tinyfinder::tinyfinder.button_use_selected_file'))
+            ->modalSubmitAction(fn (Action $action): Action => $action->extraAttributes(['class' => 'tinyfinder-archive-submit'], merge: true)->color('gray'))
             ->extraModalFooterActions([
                 self::makeTinyFinderUploadFromArchiveAction(
                     parentActionName: $name,
@@ -168,9 +168,9 @@ class ExampleResource extends Resource
             ])
             ->schema([
                 \Filament\Forms\Components\Select::make('file_id')
-                    ->label($type === 'image' ? 'Choose Image' : 'Choose File')
+                    ->label(__("filament-tinyfinder::tinyfinder.archive_choose_{$type}"))
                     ->required()
-                    ->placeholder('Select an item')
+                    ->placeholder(__('filament-tinyfinder::tinyfinder.archive_select_placeholder'))
                     ->searchable()
                     ->allowHtml()
                     ->optionsLimit(5)
@@ -187,7 +187,7 @@ class ExampleResource extends Resource
 
                 if (! $record) {
                     throw ValidationException::withMessages([
-                        'file_id' => 'Please choose a file from the archive.',
+                        'file_id' => __('filament-tinyfinder::tinyfinder.alert_not_selected_file'),
                     ]);
                 }
 
@@ -201,17 +201,17 @@ class ExampleResource extends Resource
         \Closure $onUploaded,
     ): Action {
         return Action::make("tinyfinderNewUploadFromArchive{$parentActionName}")
-            ->label('New Upload')
+            ->label(__('filament-tinyfinder::tinyfinder.button_new_upload'))
             ->icon(Heroicon::ArrowUpTray)
             ->color('gray')
             ->extraAttributes(['class' => 'tinyfinder-new-upload-action'], merge: true)
-            ->modalHeading($type === 'image' ? 'Upload Image' : 'Upload File')
+            ->modalHeading(__($type === 'image' ? 'filament-tinyfinder::tinyfinder.text_upload_img' : 'filament-tinyfinder::tinyfinder.text_upload_file'))
             ->modalWidth(Width::FourExtraLarge)
             ->schema([
                 self::configureTinyFinderUploadField(
                     type: $type,
                     field: FileUpload::make('file')
-                        ->label($type === 'image' ? 'Image' : 'File')
+                        ->label(__("filament-tinyfinder::tinyfinder.type_{$type}"))
                         ->required()
                         ->storeFiles(false)
                         ->maxSize(self::getTinyFinderMaxUploadSizeInKilobytes($type)),
@@ -228,7 +228,7 @@ class ExampleResource extends Resource
 
                 if (! $file instanceof UploadedFile) {
                     throw ValidationException::withMessages([
-                        'file' => 'Please choose a file to upload.',
+                        'file' => __('filament-tinyfinder::tinyfinder.alert_no_file_uploaded'),
                     ]);
                 }
 
@@ -241,8 +241,8 @@ class ExampleResource extends Resource
 
                     throw ValidationException::withMessages([
                         'file' => $type === 'image'
-                            ? 'Please upload an image file.'
-                            : 'Please upload a non-image file.',
+                            ? __('filament-tinyfinder::tinyfinder.validation_image')
+                            : __('filament-tinyfinder::tinyfinder.validation_not_image'),
                     ]);
                 }
 
@@ -317,6 +317,11 @@ class ExampleResource extends Resource
         $publicPath = e(self::toTinyFinderPublicPath($file->url));
         $fileUrl = e($file->url);
         $previewUrl = e($file->thumbnail_url ?? $file->url);
+        $copyTitle = e(__('filament-tinyfinder::tinyfinder.action_copy_url'));
+        $renameTitle = e(__('filament-tinyfinder::tinyfinder.text_rename'));
+        $resizeTitle = e(__('filament-tinyfinder::tinyfinder.button_resize'));
+        $cropTitle = e(__('filament-tinyfinder::tinyfinder.button_crop'));
+        $deleteTitle = e(__('filament-tinyfinder::tinyfinder.button_delete'));
 
         if ($file->type === 'image') {
             $dimensions = ($file->width && $file->height) ? e("{$file->width}x{$file->height}") : null;
@@ -332,11 +337,11 @@ class ExampleResource extends Resource
                         <div class="tinyfinder-archive-option-meta">{$meta}</div>
                     </div>
                     <div class="tinyfinder-archive-option-actions">
-                        <button type="button" data-tinyfinder-archive-action="copy" title="Copy URL">☍</button>
-                        <button type="button" data-tinyfinder-archive-action="rename" title="Rename">✎</button>
-                        <button type="button" data-tinyfinder-archive-action="resize" title="Resize">⚙</button>
-                        <button type="button" data-tinyfinder-archive-action="crop" title="Crop">✂</button>
-                        <button type="button" data-tinyfinder-archive-action="delete" title="Delete">🗑</button>
+                        <button type="button" data-tinyfinder-archive-action="copy" title="{$copyTitle}">☍</button>
+                        <button type="button" data-tinyfinder-archive-action="rename" title="{$renameTitle}">✎</button>
+                        <button type="button" data-tinyfinder-archive-action="resize" title="{$resizeTitle}">⚙</button>
+                        <button type="button" data-tinyfinder-archive-action="crop" title="{$cropTitle}">✂</button>
+                        <button type="button" data-tinyfinder-archive-action="delete" title="{$deleteTitle}">🗑</button>
                     </div>
                 </div>
                 HTML;
@@ -350,9 +355,9 @@ class ExampleResource extends Resource
                     <div class="tinyfinder-archive-option-meta">{$meta}</div>
                 </div>
                 <div class="tinyfinder-archive-option-actions">
-                    <button type="button" data-tinyfinder-archive-action="copy" title="Copy URL">☍</button>
-                    <button type="button" data-tinyfinder-archive-action="rename" title="Rename">✎</button>
-                    <button type="button" data-tinyfinder-archive-action="delete" title="Delete">🗑</button>
+                    <button type="button" data-tinyfinder-archive-action="copy" title="{$copyTitle}">☍</button>
+                    <button type="button" data-tinyfinder-archive-action="rename" title="{$renameTitle}">✎</button>
+                    <button type="button" data-tinyfinder-archive-action="delete" title="{$deleteTitle}">🗑</button>
                 </div>
             </div>
             HTML;

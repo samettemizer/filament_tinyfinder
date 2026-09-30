@@ -27,7 +27,7 @@ return [
     'alert_wait_current_process' => 'Bitte warten Sie für den aktuellen Prozess.',
     'alert_delete_confirm' => 'Sind Sie sicher wollen dieses Produkt dauerhaft löschen?',
     'alert_delete_success' => 'Datei erfolgreich gelöscht',
-    'alert_upload_success' => '{count} Datei(en) erfolgreich hochgeladen',
+    'alert_upload_success' => ':count Datei(en) erfolgreich hochgeladen',
     'alert_crop_success' => 'Bild erfolgreich zugeschnitten',
     'alert_resize_success' => 'Bildgröße erfolgreich geändert',
     'alert_rotate_success' => 'Bild erfolgreich gedreht',

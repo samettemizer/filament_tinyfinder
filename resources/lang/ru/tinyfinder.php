@@ -27,7 +27,7 @@ return [
     'alert_wait_current_process' => 'Пожалуйста, подождите для текущего процесса.',
     'alert_delete_confirm' => 'вы обязательно хотите окончательно удалить этот элемент?',
     'alert_delete_success' => 'Файл успешно удален',
-    'alert_upload_success' => '{count} файл(ов) успешно загружено',
+    'alert_upload_success' => ':count файл(ов) успешно загружено',
     'alert_crop_success' => 'Изображение успешно обрезано',
     'alert_resize_success' => 'Размер изображения успешно изменен',
     'alert_rotate_success' => 'Изображение успешно повернуто',

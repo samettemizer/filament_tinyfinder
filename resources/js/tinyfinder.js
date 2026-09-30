@@ -6,21 +6,77 @@
  */
 
 (() => {
-    const fallbackWriteText = (value) => new Promise((resolve, reject) => {
+    const tinyFinderTrans = (key) => window.tinyFinderTranslations?.[key] ?? key;
+
+    /**
+     * execCommand('copy') fallback for when the async Clipboard API is missing
+     * (insecure origin) or rejects. Returns whether the browser actually copied.
+     *
+     * - The textarea is mounted in `container`, or beside the focused element, so
+     *   modal focus traps (Filament's x-trap) don't pull focus back and wipe the
+     *   selection before the copy runs.
+     * - The copy listener writes `value` explicitly, so a lost selection can't
+     *   put stale text on the clipboard.
+     * - The user's previous selection and focus are restored afterwards.
+     */
+    const copyTextWithExecCommand = (value, container = null) => {
+        const text = String(value);
+        const previouslyFocused = document.activeElement;
+        const selection = document.getSelection();
+        const previousRange = selection?.rangeCount ? selection.getRangeAt(0) : null;
+        const host = container
+            || (previouslyFocused && previouslyFocused !== document.body ? previouslyFocused.parentElement : null)
+            || document.body;
+        const textarea = document.createElement('textarea');
+        let written = false;
+        let copied = false;
+
+        const writeClipboardData = (event) => {
+            event.clipboardData.setData('text/plain', text);
+            event.preventDefault();
+            written = true;
+        };
+
+        textarea.value = text;
+        textarea.setAttribute('readonly', '');
+        Object.assign(textarea.style, {
+            position: 'fixed',
+            top: '0',
+            left: '-9999px',
+            fontSize: '12pt', // >= 16px keeps iOS from zooming in on focus
+        });
+
+        host.appendChild(textarea);
+        textarea.focus({ preventScroll: true });
+        textarea.select();
+        textarea.setSelectionRange(0, text.length); // iOS ignores select()
+        document.addEventListener('copy', writeClipboardData, true);
+
         try {
-            const textarea = document.createElement('textarea');
-            textarea.value = value;
-            textarea.setAttribute('readonly', '');
-            textarea.style.position = 'fixed';
-            textarea.style.left = '-9999px';
-            textarea.style.top = '-9999px';
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            textarea.remove();
-            resolve();
+            // false (older engines throw) when blocked, e.g. without user activation
+            copied = document.execCommand('copy') && written;
         } catch (error) {
-            reject(error);
+            copied = false;
+        } finally {
+            document.removeEventListener('copy', writeClipboardData, true);
+            textarea.remove();
+        }
+
+        if (previousRange) {
+            selection.removeAllRanges();
+            selection.addRange(previousRange);
+        }
+
+        previouslyFocused?.focus?.({ preventScroll: true });
+
+        return copied;
+    };
+
+    const fallbackWriteText = (value) => new Promise((resolve, reject) => {
+        if (copyTextWithExecCommand(value)) {
+            resolve();
+        } else {
+            reject(new DOMException('The browser blocked copying to the clipboard.', 'NotAllowedError'));
         }
     });
 
@@ -218,13 +274,7 @@
         const modal = option.closest?.('.fi-modal') || document.querySelector('.fi-modal');
 
         setTimeout(() => {
-            const submitButton = Array.from(modal?.querySelectorAll('button') || []).find((button) => {
-                const text = button.textContent?.trim() || '';
-
-                return ! button.disabled && text === 'Use selected file';
-            });
-
-            submitButton?.click();
+            modal?.querySelector('.tinyfinder-archive-submit:not([disabled])')?.click();
         }, 120);
     };
 
@@ -244,7 +294,7 @@
         const modal = document.querySelector('.fi-modal');
         const field = window.tinyFinderActiveField || document.querySelector('.fi-fo-field-wrp:has(.tinyfinder-archive-action), [wire\\:key]:has(.tinyfinder-archive-action)');
 
-        modal?.querySelector('[aria-label="Close"], button[title="Close"]')?.click();
+        modal?.querySelector('.fi-modal-close-btn')?.click();
 
         setTimeout(() => {
             field?.querySelector('.tinyfinder-archive-action')?.click();
@@ -255,7 +305,7 @@
         const modal = document.querySelector('.fi-modal');
         const field = window.tinyFinderActiveField || document.querySelector('.fi-fo-field-wrp:has(.tinyfinder-upload-action), [wire\\:key]:has(.tinyfinder-upload-action)');
 
-        modal?.querySelector('[aria-label="Close"], button[title="Close"]')?.click();
+        modal?.querySelector('.fi-modal-close-btn')?.click();
 
         setTimeout(() => {
             field?.querySelector('.tinyfinder-upload-action')?.click();
@@ -272,13 +322,16 @@
                     <div class="tinyfinder-crop-selection"></div>
                 </div>
                 <div class="tinyfinder-crop-actions">
-                    <button type="button" data-crop-cancel>Cancel</button>
-                    <button type="button" data-crop-save>Crop</button>
+                    <button type="button" data-crop-cancel></button>
+                    <button type="button" data-crop-save></button>
                 </div>
             </div>
         `;
 
         document.body.appendChild(modal);
+
+        modal.querySelector('[data-crop-cancel]').textContent = tinyFinderTrans('button_cancel');
+        modal.querySelector('[data-crop-save]').textContent = tinyFinderTrans('button_crop');
 
         const stage = modal.querySelector('.tinyfinder-crop-stage');
         const image = modal.querySelector('img');
@@ -594,32 +647,24 @@ Alpine.data('tinyFinderManager', (config = {}) => ({
     },
 
     /**
-     * Fallback clipboard method for older browsers
+     * Fallback when the async Clipboard API is missing or rejects.
      */
     copyToClipboardFallback(text) {
-        const textArea = document.createElement('textarea');
-        textArea.value = text;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-999999px';
-        textArea.style.top = '-999999px';
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-
-        try {
-            document.execCommand('copy');
-            this.$dispatch('notify', {
-                type: 'success',
-                message: 'URL copied to clipboard!',
-            });
-        } catch (error) {
+        if (! copyTextWithExecCommand(text, this.$el)) {
             this.$dispatch('notify', {
                 type: 'error',
                 message: 'Failed to copy URL',
             });
+
+            return;
         }
 
-        document.body.removeChild(textArea);
+        this.$dispatch('notify', {
+            type: 'success',
+            message: 'URL copied to clipboard!',
+        });
+
+        this.$dispatch('clipboard-success');
     },
 
     toggleView() {
@@ -904,7 +949,7 @@ document.addEventListener('click', async (event) => {
         }
 
         if (action === 'rename') {
-            const name = window.prompt('Rename', option.dataset.fileName || '');
+            const name = window.prompt(tinyFinderTrans('text_rename'), option.dataset.fileName || '');
 
             if (! name) {
                 return;
@@ -919,13 +964,13 @@ document.addEventListener('click', async (event) => {
             const currentDimensions = option.querySelector('.tinyfinder-archive-option-meta')?.textContent?.match(/(\d+)\s*x\s*(\d+)/i);
             const currentWidth = option.dataset.width || currentDimensions?.[1] || '';
             const currentHeight = option.dataset.height || currentDimensions?.[2] || '';
-            const width = window.prompt('Width', currentWidth);
+            const width = window.prompt(tinyFinderTrans('text_width'), currentWidth);
 
             if (width === null) {
                 return;
             }
 
-            const height = window.prompt('Height', currentHeight);
+            const height = window.prompt(tinyFinderTrans('text_height'), currentHeight);
 
             if (height === null) {
                 return;
@@ -976,7 +1021,7 @@ document.addEventListener('click', async (event) => {
         }
 
         if (action === 'delete') {
-            if (! window.confirm('Delete this file?')) {
+            if (! window.confirm(tinyFinderTrans('alert_delete_confirm'))) {
                 return;
             }
 
@@ -987,7 +1032,7 @@ document.addEventListener('click', async (event) => {
         }
     } catch (error) {
         console.error(error);
-        window.alert('TinyFinder action failed.');
+        window.alert(tinyFinderTrans('text_process_failed'));
     }
 }, true);
 

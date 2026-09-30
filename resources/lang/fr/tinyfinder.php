@@ -27,7 +27,7 @@ return [
     'alert_wait_current_process' => 'Veuillez patienter pour le processus en cours.',
     'alert_delete_confirm' => 'Etes-vous sûr que vous voulez supprimer définitivement ce point?',
     'alert_delete_success' => 'Fichier supprimé avec succès',
-    'alert_upload_success' => '{count} fichier(s) téléchargé(s) avec succès',
+    'alert_upload_success' => ':count fichier(s) téléchargé(s) avec succès',
     'alert_crop_success' => 'Image recadrée avec succès',
     'alert_resize_success' => 'Image redimensionnée avec succès',
     'alert_rotate_success' => 'Image pivotée avec succès',

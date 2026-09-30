@@ -17,6 +17,7 @@ It provides image and file uploads, an archive browser, image crop/resize action
 composer require stemizer/filament_tinyfinder
 
 php artisan vendor:publish --tag="filament-tinyfinder-config"
+php artisan vendor:publish --tag="filament-tinyfinder-migrations"
 php artisan migrate
 php artisan storage:link
 php artisan filament:assets

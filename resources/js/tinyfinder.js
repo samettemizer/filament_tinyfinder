@@ -8,21 +8,75 @@
 (() => {
     const tinyFinderTrans = (key) => window.tinyFinderTranslations?.[key] ?? key;
 
-    const fallbackWriteText = (value) => new Promise((resolve, reject) => {
+    /**
+     * execCommand('copy') fallback for when the async Clipboard API is missing
+     * (insecure origin) or rejects. Returns whether the browser actually copied.
+     *
+     * - The textarea is mounted in `container`, or beside the focused element, so
+     *   modal focus traps (Filament's x-trap) don't pull focus back and wipe the
+     *   selection before the copy runs.
+     * - The copy listener writes `value` explicitly, so a lost selection can't
+     *   put stale text on the clipboard.
+     * - The user's previous selection and focus are restored afterwards.
+     */
+    const copyTextWithExecCommand = (value, container = null) => {
+        const text = String(value);
+        const previouslyFocused = document.activeElement;
+        const selection = document.getSelection();
+        const previousRange = selection?.rangeCount ? selection.getRangeAt(0) : null;
+        const host = container
+            || (previouslyFocused && previouslyFocused !== document.body ? previouslyFocused.parentElement : null)
+            || document.body;
+        const textarea = document.createElement('textarea');
+        let written = false;
+        let copied = false;
+
+        const writeClipboardData = (event) => {
+            event.clipboardData.setData('text/plain', text);
+            event.preventDefault();
+            written = true;
+        };
+
+        textarea.value = text;
+        textarea.setAttribute('readonly', '');
+        Object.assign(textarea.style, {
+            position: 'fixed',
+            top: '0',
+            left: '-9999px',
+            fontSize: '12pt', // >= 16px keeps iOS from zooming in on focus
+        });
+
+        host.appendChild(textarea);
+        textarea.focus({ preventScroll: true });
+        textarea.select();
+        textarea.setSelectionRange(0, text.length); // iOS ignores select()
+        document.addEventListener('copy', writeClipboardData, true);
+
         try {
-            const textarea = document.createElement('textarea');
-            textarea.value = value;
-            textarea.setAttribute('readonly', '');
-            textarea.style.position = 'fixed';
-            textarea.style.left = '-9999px';
-            textarea.style.top = '-9999px';
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            textarea.remove();
-            resolve();
+            // false (older engines throw) when blocked, e.g. without user activation
+            copied = document.execCommand('copy') && written;
         } catch (error) {
-            reject(error);
+            copied = false;
+        } finally {
+            document.removeEventListener('copy', writeClipboardData, true);
+            textarea.remove();
+        }
+
+        if (previousRange) {
+            selection.removeAllRanges();
+            selection.addRange(previousRange);
+        }
+
+        previouslyFocused?.focus?.({ preventScroll: true });
+
+        return copied;
+    };
+
+    const fallbackWriteText = (value) => new Promise((resolve, reject) => {
+        if (copyTextWithExecCommand(value)) {
+            resolve();
+        } else {
+            reject(new DOMException('The browser blocked copying to the clipboard.', 'NotAllowedError'));
         }
     });
 
@@ -593,32 +647,24 @@ Alpine.data('tinyFinderManager', (config = {}) => ({
     },
 
     /**
-     * Fallback clipboard method for older browsers
+     * Fallback when the async Clipboard API is missing or rejects.
      */
     copyToClipboardFallback(text) {
-        const textArea = document.createElement('textarea');
-        textArea.value = text;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-999999px';
-        textArea.style.top = '-999999px';
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-
-        try {
-            document.execCommand('copy');
-            this.$dispatch('notify', {
-                type: 'success',
-                message: 'URL copied to clipboard!',
-            });
-        } catch (error) {
+        if (! copyTextWithExecCommand(text, this.$el)) {
             this.$dispatch('notify', {
                 type: 'error',
                 message: 'Failed to copy URL',
             });
+
+            return;
         }
 
-        document.body.removeChild(textArea);
+        this.$dispatch('notify', {
+            type: 'success',
+            message: 'URL copied to clipboard!',
+        });
+
+        this.$dispatch('clipboard-success');
     },
 
     toggleView() {

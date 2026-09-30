@@ -69,8 +69,8 @@ class FilamentTinyFinderServiceProvider extends PackageServiceProvider
         );
 
         // Livewire Components
-        Livewire::component('tinyfinder::file-manager', FileManager::class);
-        Livewire::component('tinyfinder::image-cropper', ImageCropper::class);
+        Livewire::component('tinyfinder.file-manager', FileManager::class);
+        Livewire::component('tinyfinder.image-cropper', ImageCropper::class);
 
         // Storage disk configuration
         $this->configureTinyFinderDisk();
